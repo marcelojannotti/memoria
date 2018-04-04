@@ -20,13 +20,24 @@
 		      this.fig[pos].el.style['background'] = this.fig[pos].src;
 		      prev = null;
 		      if (++pt == n) {
-		        setTimeout(function() {alert('Parabéns!!! Você venceu');oMem.clear();},1000);
+			var elAudio = document.createElement('audio');
+			elAudio.src = "https://freesound.org/data/previews/270/270333_5123851-lq.mp3";
+			elAudio.play();
+		        alert('Parabéns!!! Você venceu');
+			oMem.clear();https://freesound.org/data/previews/141/141334_2393869-lq.mp3
+		      } else {
+			var elAudio = document.createElement('audio');
+			elAudio.src = "https://freesound.org/data/previews/220/220184_4100837-lq.mp3";
+			elAudio.play();
 		      }
 		      return true;
 		    } else {
 		      lock = true;
           this.fig[pos].selected = true;
 		      this.fig[pos].el.style['background'] = this.fig[pos].src;
+		      var elAudio = document.createElement('audio');
+		      elAudio.src = "https://freesound.org/data/previews/141/141334_2393869-lq.mp3";
+		      elAudio.play();
 		      setTimeout(function () {
 	          prev.selected = false;
 		        oMem.fig[this].selected = false;
@@ -34,7 +45,7 @@
 				    oMem.fig[this].el.style['background'] = '';
 			      prev = null;
 			      lock = false;
-					}.bind(pos),1500);
+					}.bind(pos),1000);
 		      return false;		    
 		    }
 		  }
