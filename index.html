@@ -22,7 +22,7 @@
 		      prev = null;
 		      if (++pt == n) {
 			var elAudio = document.createElement('audio');
-			elAudio.src = "https://freesound.org/data/previews/270/270333_5123851-lq.mp3";
+			elAudio.src = "snd/fim.mp3";
 			elAudio.addEventListener("ended", function(){
 			  var currentScore = Math.floor((Date.now() - timer) / 1000), ranking = '';
 			  if (localStorage.score === undefined) {
@@ -52,7 +52,7 @@
 			elAudio.play();
 		      } else {
 			var elAudio = document.createElement('audio');
-			elAudio.src = "https://freesound.org/data/previews/220/220184_4100837-lq.mp3";
+			elAudio.src = "snd/acerto.mp3";
 			elAudio.play();
 		      }
 		      return true;
@@ -61,7 +61,7 @@
           this.fig[pos].selected = true;
 		      this.fig[pos].el.style['background'] = this.fig[pos].src;
 		      var elAudio = document.createElement('audio');
-		      elAudio.src = "https://freesound.org/data/previews/141/141334_2393869-lq.mp3";
+		      elAudio.src = "snd/erro.mp3";
 		      elAudio.play();
 		      setTimeout(function () {
 	          prev.selected = false;
@@ -103,20 +103,22 @@
 		}
 	  window.addEventListener('load',function () {
 			var teste = new Memoria([
-			"url('https://i.ytimg.com/vi/Q6aDILm9UM0/maxresdefault.jpg')",
-			"url('https://http2.mlstatic.com/S_670306-MLB25689492262_062017-O.jpg')",
-			"url('https://vignette.wikia.nocookie.net/qubo-channel/images/3/32/Fico.PNG/revision/latest?cb=20170717172229')",
-			"url('http://ecsmedia.pl/c/super-wings-figurka-z-ruchomym-elementem-jett-w-iext52675837.jpg')",
-			"url('https://pmcdeadline2.files.wordpress.com/2017/12/maxresdefault1.jpg?w=446&h=299&crop=1')",
-			"url('https://imgc.allpostersimages.com/img/print/posters/walt-disney-mickey-mouse-classic_a-G-9067566-0.jpg')",
-			"url('https://rihappy.vteximg.com.br/arquivos/ids/336225-800-800/kit-bonecos-interativos-patati-patata-candide-9500-9502_Frente.jpg?v=636372834229570000')",
-			"url('https://upload.wikimedia.org/wikipedia/pt/d/d6/Minions.jpg')"]);
+			"url('img/1.png')",
+			"url('img/2.png')",
+			"url('img/3.png')",
+			"url('img/4.png')",
+			"url('img/5.png')",
+			"url('img/6.png')",
+			"url('img/7.png')",
+			"url('img/8.png')"]);
 		  teste.clear(); 
 		});
 		</script>
 		<style>
 		  #memoria {
 		    border: 0px solid black;
+		    background-image: url('img/fundo.png');
+		    background-size: 100% 100%;
 		    width:100%;
 		    height:100%;
   -webkit-touch-callout: none; /* iOS Safari */
@@ -128,9 +130,10 @@
                                   supported by Chrome and Opera */
 		  }
 		  #f1,#f2,#f3,#f4,#f5,#f6,#f7,#f8,#f9,#f10,#f11,#f12,#f13,#f14,#f15,#f16 {
-		    border: 1px solid black;
+		    border: 2px solid black;
 		    min-width:25%;
 		    min-height:25%;
+/*		    background: white;*/
 		    background-size:auto 100% !important;
 		    background-repeat:no-repeat !important;
 		    background-position: center !important;
