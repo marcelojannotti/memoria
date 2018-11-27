@@ -1,1 +1,226 @@
+<html>
+	<head>
+		<title></title>
+		<script>
+		function jogador(nome) {
+		  var pontos = 0;
+		  while (!nome) {
+  		  nome = prompt('Informe o nome do Jogador');
+		  }
+		  this.nome = nome;
+		  this.pontos = function () {return pontos;}
+		  this.acerto = function () {
+		    pontos++;
+		  }
+		}
+		
+		function Memoria (nJg,imgs = Array) {
+		  var oMem = this
+		  ,n = imgs.length
+		  ,timer
+		  ,audios=['snd/acerto.mp3','snd/erro.mp3','snd/fim.mp3']
+		  ,jogadores = Array()
+		  ,vez
+		  ,vencedor;
+		  if ((n/4) < nJg) throw 'Muitos jogadores para poucas figuras'; 
+		  if (n < 3) throw 'Número muito pequeno de figuras';
+		  if (Math.sqrt(n*2)%2 != 0) throw 'O número de figuras não desenha um quadrado.';
+		  var prev = null, lock=false, pt=0;
+		  this.select = function (pos) {
+		    if (lock) return;
+				timer = (timer === false?Date.now():timer);
+		    if (this.fig[pos].selected) {
+		    } else if (prev === null) {
+          this.fig[pos].selected = true;
+		      this.fig[pos].el.style['background'] = this.fig[pos].src;
+		      prev = this.fig[pos];
+		      return null;
+		    } else if (prev.id == this.fig[pos].id) {
+          this.fig[pos].selected = true;
+		      this.fig[pos].el.style['background'] = this.fig[pos].src;
+		      prev = null;
+		      if (++pt == n) {
+			      vez.acerto();
+		        var elAudio = document.createElement('audio');
+		        elAudio.src = audios[2];
+		        elAudio.addEventListener("ended", function(){
+		          for (var x in jogadores) {
+		            if (vencedor) vencedor = (vencedor.pontos()<jogadores[x].pontos()?jogadores[x]:vencedor);
+		            else vencedor = jogadores[x];
+		          }
+		          if ((imgs.length/nJg) == vencedor.pontos()) alert('A partida empatou com '+vencedor.pontos()+' pontos');
+		          else alert(vencedor.nome+' veceu o jogo, com '+vencedor.pontos()+' pontos');
+			        oMem.clear();
+			      }, false);
+			      elAudio.play();
+		      } else {
+			      var elAudio = document.createElement('audio');
+			      elAudio.src = audios[0];
+			      elAudio.play();
+			      vez.acerto();
+		      }
+		      return true;
+		    } else {
+		      lock = true;
+          this.fig[pos].selected = true;
+		      this.fig[pos].el.style['background'] = this.fig[pos].src;
+		      var elAudio = document.createElement('audio');
+		      elAudio.src = audios[1];
+		      elAudio.play();
+		      setTimeout(function () {
+	          prev.selected = false;
+		        oMem.fig[this].selected = false;
+				    prev.el.style['background'] = '';
+				    oMem.fig[this].el.style['background'] = '';
+			      prev = null;
+			      lock = false;
+					}.bind(pos),1000);
+		      vez = (jogadores.indexOf(vez) >= (jogadores.length-1)?jogadores[0]:jogadores[jogadores.indexOf(vez)+1]);
+		      
+		      return false;		    
+		    }
+		  }
+		  this.clear = function () {
+				var o = Array.apply(null, {length: n});
+				pt = 0;
+				timer = false;
 
+     		for (var x = 0; x < nJg;x++) {
+     		  jogadores[x] = new jogador(prompt('Informe o nome do Jogador',(jogadores[x]?jogadores[x].nome:undefined)));
+     		}
+     		vez = jogadores[Math.floor((Math.random()*10)%(nJg - 0.1))];
+	  		vencedor = undefined;
+
+			  this.fig = Array.apply(null, {length: n*2});
+				for (var x = 0; x < n*2; x++) {
+				  var rand = 0;
+					do {
+					  rand = Math.floor((Math.random() * 10) % n);
+					  o[rand] = (o[rand] === undefined?0:o[rand]);
+					  if (o[rand] < 2) {
+							this.fig[x] = {};
+							this.fig[x].id = rand+1;
+							this.fig[x].src = 'url("'+imgs[rand]+'")';
+							this.fig[x].selected = false;
+							this.fig[x].el = document.querySelector('#memoria #f'+(x+1));
+							this.fig[x].el.style['background'] = "";
+							this.fig[x].el.onclick = function () {
+								oMem.select(this);
+								loadPlacar(document.getElementById('jogadores'));
+							}.bind(x);
+							o[rand]++;
+							break;
+					  }
+					} while (o[rand] >= 2)
+				}
+				loadPlacar(document.getElementById('jogadores'));
+		  }
+		  
+		  function loadPlacar(el) {
+		    el.innerHTML = '';
+		    for (var x in jogadores) {
+		      el.innerHTML = el.innerHTML+'<div style="display:inline-block; margin: 0 20px">'+jogadores[x].nome+': '+jogadores[x].pontos()+' pts'+ (jogadores[x]==vez?' (X)':'');
+		    }
+		  }
+		  		  
+			function loadAudio(arr) {
+			  if (x < arr.length) {
+       		var load = document.createElement('audio');
+		      load.src = arr[x];
+		      x++;
+		      load.addEventListener('load',loadAudio(arr));
+		    } else {
+		      x=0;
+          loadImg(imgs);
+        }
+		  }
+			function loadImg(arr) {
+			  if (x < arr.length) {
+       		var load = document.createElement('img');
+		      load.src = arr[x];
+		      x++;
+		      load.addEventListener('load',loadImg(arr));
+		    } else {
+		      document.getElementById('avisoLOAD').style['display'] = 'none';
+		      document.getElementById('avisoDONE').style['display'] = 'inline';
+		      document.getElementById('avisoBTN').style['display'] = 'inline';
+		    }
+		  }
+   		var x=0;
+   		loadAudio(audios);
+		}
+		
+	  window.addEventListener('load',function () {    
+			(new Memoria(2,[
+			"img/1.png",
+			"img/2.png",
+			"img/3.png",
+			"img/4.png",
+			"img/5.png",
+			"img/6.png",
+			"img/7.png",
+			"img/8.png"])).clear(); 
+		});
+		</script>
+		<style>
+      @media (orientation: landscape) {
+        #avisoTXT1 {
+          display: none;
+        }
+      }
+      
+      @media (orientation: portrait) {
+        #avisoTXT2 {
+          display: none;
+        }
+      }
+      
+      * {
+        user-select: none;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+      }
+      
+		  #memoria {
+		    border: 0px solid black;
+		    background-image: url('img/fundo.png');
+		    background-size: 100% 100%;
+		    width:100%;
+		    height:100%;
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+		  }
+		  #f1,#f2,#f3,#f4,#f5,#f6,#f7,#f8,#f9,#f10,#f11,#f12,#f13,#f14,#f15,#f16 {
+		    border: 2px solid black;
+		    min-width:25%;
+		    min-height:25%;
+/*		    background: white;*/
+		    background-size:100% auto !important;
+		    background-repeat:no-repeat !important;
+		    background-position: center !important;
+		  }
+		</style>
+		<script>
+	  </script>
+	</head>
+	<body>
+	<div id="jogadores"></div>
+	<table id="memoria">
+	<tr>
+	<td id="f1">&nbsp;</td><td id="f2">&nbsp;</td><td id="f3">&nbsp;</td><td id="f4">&nbsp;</td>
+	<tr>
+	<td id="f5">&nbsp;</td><td id="f6">&nbsp;</td><td id="f7">&nbsp;</td><td id="f8">&nbsp;</td>
+	<tr>
+	<td id="f9">&nbsp;</td><td id="f10">&nbsp;</td><td id="f11">&nbsp;</td><td id="f12">&nbsp;</td>
+	<tr>
+	<td id="f13">&nbsp;</td><td id="f14">&nbsp;</td><td id="f15">&nbsp;</td><td id="f16">&nbsp;</td>
+	</table>
+  <div id="aviso" style="position:absolute;left:0;top:0;width:100%;height:100%; text-align:center"><div style="margin:10% auto;padding:15px;background:white;width:70%;"><span id="avisoTXT1">Matenha o dispositvo na posição horizontal para melhor visualização.</br><img src="https://robertwattner.com/wp-content/uploads/2018/01/icon-horizontal.png" height="64"/></br></span><span id="avisoLOAD"><br/>Carregando Sons e Imagens...<br/><img src="http://www.startpad.biz/images/rocket-icon-gif.gif" width="64" height="64"/></span><span id="avisoDONE" style="display:none;"><span id="avisoTXT2"><br/>Pronto! Vamos começar?</span><br/><button id="avisoBTN" style="margin:20px auto;" onclick="document.getElementById('aviso').style['display'] = 'none';">Ok</button></span></div></div>
+	</body>
+</html>
