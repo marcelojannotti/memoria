@@ -1,9 +1,12 @@
 <html>
 	<head>
 		<title></title>
+
+
 		<script>
 		function Memoria (imgs = Array) {
-		  var oMem = this,n = imgs.length, timer;
+		  var oMem = this,n = imgs.length, timer
+		  ,audios=['snd/acerto.mp3','snd/erro.mp3','snd/fim.mp3'];
 		  if (n < 3) throw 'Número muito pequeno de figuras';
 		  if (Math.sqrt(n*2)%2 != 0) throw 'O número de figuras não desenha um quadrado.';
 		  var prev = null, lock=false, pt=0;
@@ -87,7 +90,7 @@
 					  if (o[rand] < 2) {
 							this.fig[x] = {};
 							this.fig[x].id = rand+1;
-							this.fig[x].src = imgs[rand];
+							this.fig[x].src = 'url("'+imgs[rand]+'")';
 							this.fig[x].selected = false;
 							this.fig[x].el = document.querySelector('#memoria #f'+(x+1));
 							this.fig[x].el.style['background'] = "";
@@ -100,21 +103,59 @@
 					} while (o[rand] >= 2)
 				}
 		  }
+			function loadAudio(arr) {
+			  if (x < arr.length) {
+       		var load = document.createElement('audio');
+		      load.src = arr[x];
+		      x++;
+		      load.addEventListener('load',loadAudio(arr));
+		    } else {
+		      x=0;
+          loadImg(imgs);
+        }
+		  }
+			function loadImg(arr) {
+			  if (x < arr.length) {
+       		var load = document.createElement('img');
+		      load.src = arr[x];
+		      x++;
+		      load.addEventListener('load',loadImg(arr));
+		    } else {
+		      document.getElementById('avisoLOAD').style['display'] = 'none';
+		      document.getElementById('avisoDONE').style['display'] = 'inline';
+		      document.getElementById('avisoBTN').style['display'] = 'inline';
+		    }
+		  }
+   		var x=0;
+   		loadAudio(audios);
 		}
+		
 	  window.addEventListener('load',function () {
 			var teste = new Memoria([
-			"url('img/1.png')",
-			"url('img/2.png')",
-			"url('img/3.png')",
-			"url('img/4.png')",
-			"url('img/5.png')",
-			"url('img/6.png')",
-			"url('img/7.png')",
-			"url('img/8.png')"]);
+			"img/1.png",
+			"img/2.png",
+			"img/3.png",
+			"img/4.png",
+			"img/5.png",
+			"img/6.png",
+			"img/7.png",
+			"img/8.png"]);
 		  teste.clear(); 
 		});
 		</script>
 		<style>
+      @media (orientation: landscape) {
+        #avisoTXT1 {
+          display: none;
+        }
+      }
+      
+      @media (orientation: portrait) {
+        #avisoTXT2 {
+          display: none;
+        }
+      }
+      
 		  #memoria {
 		    border: 0px solid black;
 		    background-image: url('img/fundo.png');
@@ -134,11 +175,13 @@
 		    min-width:25%;
 		    min-height:25%;
 /*		    background: white;*/
-		    background-size:auto 100% !important;
+		    background-size:100% auto !important;
 		    background-repeat:no-repeat !important;
 		    background-position: center !important;
 		  }
 		</style>
+		<script>
+	  </script>
 	</head>
 	<body>
 	<table id="memoria">
@@ -151,5 +194,6 @@
 	<tr>
 	<td id="f13">&nbsp;</td><td id="f14">&nbsp;</td><td id="f15">&nbsp;</td><td id="f16">&nbsp;</td>
 	</table>
+  <div id="aviso" style="position:absolute;left:0;top:0;width:100%;height:100%; text-align:center"><div style="margin:10% auto;padding:15px;background:white;width:70%;"><span id="avisoTXT1">Matenha o dispositvo na posição horizontal para melhor visualização.</br><img src="https://robertwattner.com/wp-content/uploads/2018/01/icon-horizontal.png" height="64"/></br></span><span id="avisoLOAD"><br/>Carregando Sons e Imagens...<br/><img src="http://www.startpad.biz/images/rocket-icon-gif.gif" width="64" height="64"/></span><span id="avisoDONE" style="display:none;"><span id="avisoTXT2"><br/>Pronto! Vamos começar?</span><br/><button id="avisoBTN" style="margin:20px auto;" onclick="document.getElementById('aviso').style['display'] = 'none';">Ok</button></span></div></div>
 	</body>
 </html>
