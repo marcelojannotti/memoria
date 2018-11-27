@@ -122,7 +122,8 @@
 		      load.addEventListener('load',loadImg(arr));
 		    } else {
 		      document.getElementById('avisoLOAD').style['display'] = 'none';
-		      document.getElementById('avisoDONE').style['display'] = 'block';
+		      document.getElementById('avisoDONE').style['display'] = 'inline';
+		      document.getElementById('avisoBTN').style['display'] = 'inline';
 		    }
 		  }
    		var x=0;
@@ -148,6 +149,13 @@
           display: none;
         }
       }
+      
+      @media (orientation: portrait) {
+        #avisoTXT2 {
+          display: none;
+        }
+      }
+      
 		  #memoria {
 		    border: 0px solid black;
 		    background-image: url('img/fundo.png');
@@ -186,6 +194,6 @@
 	<tr>
 	<td id="f13">&nbsp;</td><td id="f14">&nbsp;</td><td id="f15">&nbsp;</td><td id="f16">&nbsp;</td>
 	</table>
-  <div id="aviso" style="position:absolute;left:0;top:0;width:100%;height:100%; text-align:center"><div style="margin:10% auto;padding:15px;background:white;width:70%;"><span id="avisoTXT1">Matenha o dispositvo na posição horizontal para melhor visualização.</br><img src="https://robertwattner.com/wp-content/uploads/2018/01/icon-horizontal.png" height="64"/></br></span><span id="avisoLOAD"><br/>Carregando Sons e Imagens...<br/><img src="http://www.startpad.biz/images/rocket-icon-gif.gif" width="64" height="64"/></span><span id="avisoDONE" style="display:none;"><br/>Pronto! Vamos começar?<br/><button style="margin:20px auto;" onclick="document.getElementById('aviso').style['display'] = 'none';">Ok</button></span></div></div>
+  <div id="aviso" style="position:absolute;left:0;top:0;width:100%;height:100%; text-align:center"><div style="margin:10% auto;padding:15px;background:white;width:70%;"><span id="avisoTXT1">Matenha o dispositvo na posição horizontal para melhor visualização.</br><img src="https://robertwattner.com/wp-content/uploads/2018/01/icon-horizontal.png" height="64"/></br></span><span id="avisoLOAD"><br/>Carregando Sons e Imagens...<br/><img src="http://www.startpad.biz/images/rocket-icon-gif.gif" width="64" height="64"/></span><span id="avisoDONE" style="display:none;"><span id="avisoTXT2"><br/>Pronto! Vamos começar?</span><br/><button id="avisoBTN" style="margin:20px auto;" onclick="document.getElementById('aviso').style['display'] = 'none';">Ok</button></span></div></div>
 	</body>
 </html>
