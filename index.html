@@ -2,17 +2,77 @@
 	<head>
 		<title></title>
 		<script>
-		function jogador(nome) {
+		function jogador(nome,ai = false) {
 		  var pontos = 0;
 		  while (!nome) {
   		  nome = prompt('Informe o nome do Jogador');
 		  }
 		  this.nome = nome;
+		  this.ai = ai;
 		  this.pontos = function () {return pontos;}
 		  this.acerto = function () {
 		    pontos++;
 		  }
 		}
+
+	  function Ai(oMem,level) {
+	    this.brain = new brain(level);
+      var prev;
+	    this.play = function (t) {
+	      switch (t) {
+	        case 1:
+	          var loopStop = false;
+	          for (var x in this.brain.memory) {
+  		        for (var y in this.brain.memory) {
+	              if (this.brain.memory[x] != this.brain.memory[y] && this.brain.memory[x].id == this.brain.memory[y].id && !this.brain.memory[x].selected) {
+      				    prev=this.brain.memory[x];
+	                this.brain.memory[x].el.click();
+	                loopStop = true;
+	                break;
+	              }
+	            }
+	            if (loopStop) break;
+	          }
+            if (loopStop) break;
+	          do {
+    				  var rand = 0;
+				      rand = Math.floor((Math.random() * oMem.fig.length) % oMem.fig.length);
+	          } while (this.brain.memory.indexOf(oMem.fig[rand]) >= 0 || oMem.fig[rand].selected);
+				    prev = oMem.fig[rand];
+	          oMem.fig[rand].el.click();
+	        break;
+	        case 2:
+	          var loopStop = false;
+            for (var x in this.brain.memory) {
+              if (prev != this.brain.memory[x] && prev.id == this.brain.memory[x].id) {
+                this.brain.memory[x].el.click();
+                loopStop = true;
+                break ;
+              }
+            }
+            if (loopStop) break;
+  				  do {
+    				  var rand = 0;
+		          rand = Math.floor((Math.random() * oMem.fig.length) % oMem.fig.length);
+		        } while (this.brain.memory.indexOf(oMem.fig[rand]) >= 0 || oMem.fig[rand].selected);
+            oMem.fig[rand].el.click();
+	        break;
+	          
+	        default: throw "Tipo de jogada inválida";
+	      }
+	    }
+	    function brain (level = null) {
+	      this.memory = Array();
+	      
+	      this.add = function (img) {
+	        if (level === null) return;
+          this.memory.splice(0,0,img);
+	        if (level > 0) {
+	          this.memory.splice(level - this.memory.length,this.memory.length- level);
+	        }
+	      }
+	    }
+	  }
 		
 		function Memoria (nJg,imgs = Array) {
 		  var oMem = this
@@ -29,6 +89,13 @@
 		  this.select = function (pos) {
 		    if (lock) return;
 				timer = (timer === false?Date.now():timer);
+        if (!this.fig[pos].selected) {
+          for (var x in jogadores) {
+            if (jogadores[x].ai) {
+              jogadores[x].ai.brain.add(this.fig[pos]);
+            }
+          }
+        }
 		    if (this.fig[pos].selected) {
 		    } else if (prev === null) {
           this.fig[pos].selected = true;
@@ -58,6 +125,7 @@
 			      elAudio.src = audios[0];
 			      elAudio.play();
 			      vez.acerto();
+  		      startAiTurn();
 		      }
 		      return true;
 		    } else {
@@ -76,8 +144,8 @@
 			      lock = false;
 					}.bind(pos),1000);
 		      vez = (jogadores.indexOf(vez) >= (jogadores.length-1)?jogadores[0]:jogadores[jogadores.indexOf(vez)+1]);
-		      
-		      return false;		    
+		      startAiTurn();
+		      return false;
 		    }
 		  }
 		  this.clear = function () {
@@ -86,16 +154,16 @@
 				timer = false;
 
      		for (var x = 0; x < nJg;x++) {
-     		  jogadores[x] = new jogador(prompt('Informe o nome do Jogador',(jogadores[x]?jogadores[x].nome:undefined)));
+          jogadores[x] = (x?new jogador(['Rob','Emma','Kit','Orbit'][Math.floor((Math.random() * 4) % 4)],new Ai(this,8)):new jogador(prompt('Informe o nome do Jogador',(jogadores[x]?jogadores[x].nome:undefined)),false));
      		}
-     		vez = jogadores[Math.floor((Math.random()*10)%(nJg - 0.1))];
+     		vez = jogadores[Math.floor((Math.random()*nJg)%(nJg - 0.1))];
 	  		vencedor = undefined;
 
 			  this.fig = Array.apply(null, {length: n*2});
 				for (var x = 0; x < n*2; x++) {
 				  var rand = 0;
 					do {
-					  rand = Math.floor((Math.random() * 10) % n);
+					  rand = Math.floor((Math.random() * n) % n);
 					  o[rand] = (o[rand] === undefined?0:o[rand]);
 					  if (o[rand] < 2) {
 							this.fig[x] = {};
@@ -114,12 +182,13 @@
 					} while (o[rand] >= 2)
 				}
 				loadPlacar(document.getElementById('jogadores'));
+				startAiTurn();
 		  }
 		  
 		  function loadPlacar(el) {
 		    el.innerHTML = '';
 		    for (var x in jogadores) {
-		      el.innerHTML = el.innerHTML+'<div style="display:inline-block; margin: 0 20px">'+jogadores[x].nome+': '+jogadores[x].pontos()+' pts'+ (jogadores[x]==vez?' (X)':'');
+		      el.innerHTML = el.innerHTML+'<div style="display:inline-block; margin: 0 20px">'+jogadores[x].nome+(jogadores[x].ai?' (IA)':'')+': '+jogadores[x].pontos()+' pts'+ (jogadores[x]==vez?' [X]':'');
 		    }
 		  }
 		  		  
@@ -144,7 +213,26 @@
 		      document.getElementById('avisoLOAD').style['display'] = 'none';
 		      document.getElementById('avisoDONE').style['display'] = 'inline';
 		      document.getElementById('avisoBTN').style['display'] = 'inline';
+		      document.getElementById('avisoBTN').addEventListener('click',function(){oMem.clear()});
 		    }
+		  }
+		  function startAiTurn() {
+	      if (vez.ai) {
+	        var el = document.createElement('div');
+	        el.style['width'] = '100%';
+	        el.style['height'] = '100%';
+	        el.style['position'] = 'absolute';
+	        el.style['top'] = '0px';
+	        el.style['left'] = '0px';
+	        document.body.appendChild(el);
+	        setTimeout(function(){
+	          vez.ai.play(1);
+	          setTimeout(function(){
+	            vez.ai.play(2);
+    	        document.body.removeChild(el);
+	          },3000);
+	        },3000);
+	      }
 		  }
    		var x=0;
    		loadAudio(audios);
@@ -159,7 +247,7 @@
 			"img/5.png",
 			"img/6.png",
 			"img/7.png",
-			"img/8.png"])).clear(); 
+			"img/8.png"]));
 		});
 		</script>
 		<style>
@@ -215,6 +303,7 @@
 	<tr>
 	<td id="f1">&nbsp;</td><td id="f2">&nbsp;</td><td id="f3">&nbsp;</td><td id="f4">&nbsp;</td>
 	<tr>
+	
 	<td id="f5">&nbsp;</td><td id="f6">&nbsp;</td><td id="f7">&nbsp;</td><td id="f8">&nbsp;</td>
 	<tr>
 	<td id="f9">&nbsp;</td><td id="f10">&nbsp;</td><td id="f11">&nbsp;</td><td id="f12">&nbsp;</td>
